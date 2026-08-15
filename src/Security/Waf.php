@@ -8,7 +8,7 @@ class Waf
         'sqli'      => '/(union\s+select|select\s+.*\s+from|insert\s+into|delete\s+from|drop\s+table|update\s+.*\s+set|alter\s+table|exec\s*\(|benchmark\s*\(|sleep\s*\()/i',
         'xss'       => '/(<script[\s>]|javascript:|onload\s*=|onerror\s*=|document\.cookie|document\.location|<iframe|<object|<embed)/i',
         'traversal' => '/(\.\.\/|\.\.\\\|proc\/self\/environ|etc\/passwd|boot\.ini|win\.ini)/i',
-        'rce'       => '/(;\s*(cat|ls|whoami|nc|bash|sh|curl|wget|chmod|python|perl|php)\s+|eval\s*\(|system\s*\(|passthru\s*\(|shell_exec\s*\(|exec\s*\()/i',
+        'rce'       => '/(;\s*(cat|ls|whoami|nc|bash|sh|curl|wget|chmod|python|perl|php)(\s+|$|;)|eval\s*\(|system\s*\(|passthru\s*\(|shell_exec\s*\(|exec\s*\()/i',
     ];
 
     /**

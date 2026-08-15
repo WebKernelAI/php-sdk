@@ -18,7 +18,7 @@ To securely connect your PHP application to the WebKernelAI Cloud without databa
 ### 👉 **[Generate Secure Pairing Secret Online](https://webkernelai.com/php-sdk)**
 
 1. Visit **[https://webkernelai.com/php-sdk](https://webkernelai.com/php-sdk)**.
-2. Enter your domain (e.g., `theoneeducation.in` or `yourdomain.com`).
+2. Enter your domain (e.g., `example.com` or `yourdomain.com`).
 3. Click **"Generate 256-Bit Pairing Secret"**.
 4. The studio uses a cryptographically secure pseudorandom number generator (**256-bit CSPRNG**) to generate a collision-resistant `wk_sec_...` secret and unique `wk_...` site identifier.
 5. Copy your credentials into your `.env` or application config.

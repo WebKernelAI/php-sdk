@@ -2,11 +2,17 @@
 
 namespace WebKernelAI\SDK\Laravel;
 
-use Illuminate\Support\ServiceProvider;
-use WebKernelAI\SDK\Client;
-use WebKernelAI\SDK\ConfigBuilder;
+if (!class_exists('Illuminate\Support\ServiceProvider')) {
+    abstract class BaseServiceProvider
+    {
+        protected $app;
+        public function __construct($app = null) { $this->app = $app; }
+    }
+} else {
+    class_alias('Illuminate\Support\ServiceProvider', 'WebKernelAI\SDK\Laravel\BaseServiceProvider');
+}
 
-class WebKernelAIServiceProvider extends ServiceProvider
+class WebKernelAIServiceProvider extends BaseServiceProvider
 {
     public function register(): void
     {
