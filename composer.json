@@ -1,0 +1,45 @@
+{
+  "name": "webkernelai/php-sdk",
+  "description": "Official WebKernelAI PHP SDK for application security, WAF filtering, HMAC request signing, security headers, and SEO telemetry.",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "webkernelai",
+    "security",
+    "waf",
+    "seo",
+    "technical-seo",
+    "security-headers",
+    "hmac",
+    "zero-trust"
+  ],
+  "authors": [
+    {
+      "name": "WebKernelAI Team",
+      "email": "support@webkernelai.com",
+      "homepage": "https://webkernelai.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "WebKernelAI\\SDK\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "WebKernelAI\\SDK\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "WebKernelAI\\SDK\\Laravel\\WebKernelAIServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

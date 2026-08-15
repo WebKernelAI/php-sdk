@@ -1,0 +1,19 @@
+{
+    "key": "seo_rules",
+    "expires_at": 0,
+    "updated_at": 1786032929,
+    "value": {
+        "redirects": {
+            "/old-about": {
+                "target": "/about-us",
+                "code": 301
+            }
+        },
+        "meta": {
+            "/about-us": {
+                "title": "About Us - Ultra Secure WebKernelAI Powered Site",
+                "description": "This page is dynamically managed and secured by WebKernelAI PHP SDK."
+            }
+        }
+    }
+}

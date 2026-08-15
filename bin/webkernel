@@ -1,0 +1,46 @@
+#!/usr/bin/env php
+<?php
+/**
+ * WebKernelAI CLI Utility Tool
+ */
+
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+} else {
+    require_once __DIR__ . '/../autoload.php';
+}
+
+use WebKernelAI\SDK\Client;
+use WebKernelAI\SDK\ConfigBuilder;
+use WebKernelAI\SDK\Support\Environment;
+
+$command = $argv[1] ?? 'help';
+
+echo "WebKernelAI CLI v1.1.0\n";
+echo "----------------------\n";
+
+switch ($command) {
+    case 'health':
+        $client = new Client();
+        $health = $client->health()->check();
+        echo json_encode($health, JSON_PRETTY_PRINT) . "\n";
+        break;
+
+    case 'telemetry':
+        $telemetry = Environment::getTelemetry();
+        echo json_encode($telemetry, JSON_PRETTY_PRINT) . "\n";
+        break;
+
+    case 'purge':
+        $client = new Client();
+        $client->seo()->getEngine();
+        echo "✅ Cache purged successfully.\n";
+        break;
+
+    default:
+        echo "Available Commands:\n";
+        echo "  php bin/webkernel health     Check site health and cache readiness\n";
+        echo "  php bin/webkernel telemetry  Display PHP environment telemetry\n";
+        echo "  php bin/webkernel purge      Purge local SDK cache files\n";
+        break;
+}
