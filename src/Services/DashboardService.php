@@ -70,9 +70,57 @@ class DashboardService
                         'security-hardening', 'security-hardening-reset-defaults',
                         'security-headers-apply', 'advanced-security',
                         'advanced-security-production-lock', 'advanced-security-history',
-                        'advanced-security-rollback', 'text-controls', 'redirects', 'schemas'
+                        'advanced-security-rollback', 'text-controls', 'redirects', 'schemas',
+                        'security-scan-v2', 'infections'
                     ],
                     'timestamp'    => time()
+                ];
+                break;
+
+            case 'security-scan-v2':
+            case 'files':
+            case 'infections':
+                $offset = (int) ($data['offset'] ?? 0);
+                $limit  = (int) ($data['limit'] ?? 200);
+                $scanId = $data['scan_id'] ?? ('sdk_scan_' . time());
+
+                $rootDir = $this->config->getRootDir() ?: dirname($_SERVER['SCRIPT_FILENAME'] ?? getcwd());
+                $scanner = new \WebKernelAI\SDK\Security\MalwareScanner();
+                $scanResults = $scanner->scanDirectory($rootDir, 4, $limit);
+
+                $response = [
+                    'status'      => 'success',
+                    'success'     => true,
+                    'scan_id'     => $scanId,
+                    'total'       => $scanResults['total_scanned'] ?? 0,
+                    'clean_count' => ($scanResults['total_scanned'] ?? 0) - count($scanResults['threats_found'] ?? []),
+                    'has_more'    => false,
+                    'files'       => array_map(function ($threat) {
+                        return [
+                            'path'            => $threat['file_path'] ?? $threat['file'] ?? '',
+                            'file'            => $threat['file_path'] ?? $threat['file'] ?? '',
+                            'file_path'       => $threat['file_path'] ?? $threat['file'] ?? '',
+                            'hash'            => $threat['sha256'] ?? '',
+                            'classification'  => ($threat['status'] ?? '') === 'MALICIOUS' ? 'confirmed_malware' : 'suspicious_script',
+                            'integrity'       => 'modified',
+                            'threat_detected' => true,
+                            'malicious'       => ($threat['status'] ?? '') === 'MALICIOUS',
+                            'threat_type'     => $threat['signature'] ?? 'suspicious_code',
+                            'severity'        => $threat['severity'] ?? 'WARNING',
+                            'line_number'     => $threat['line_number'] ?? null,
+                            'snippet'         => $threat['snippet'] ?? null,
+                            'sha256'          => $threat['sha256'] ?? null,
+                            'heuristics'      => [
+                                [
+                                    'signature'   => $threat['signature'] ?? 'malware_signature',
+                                    'description' => $threat['description'] ?? 'Suspicious code pattern detected',
+                                    'severity'    => $threat['severity'] ?? 'WARNING',
+                                    'line'        => $threat['line_number'] ?? 1,
+                                    'snippets'    => !empty($threat['snippet']) ? [$threat['snippet']] : []
+                                ]
+                            ]
+                        ];
+                    }, $scanResults['threats_found'] ?? [])
                 ];
                 break;
 

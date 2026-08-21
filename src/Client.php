@@ -37,7 +37,7 @@ class Client
         $this->api       = new ApiClient($this->config);
 
         // Instantiate modular services
-        $this->securityService  = new SecurityService($this->config, $this->events);
+        $this->securityService  = new SecurityService($this->config, $this->cache, $this->events);
         $this->seoService       = new SeoService($this->cache, $this->events);
         $this->dashboardService = new DashboardService($this->config, $this->cache, $this->events, $this->api, $this->seoService);
         $this->healthService    = new HealthService($this->config, $this->api);
@@ -68,6 +68,11 @@ class Client
         return $this->api;
     }
 
+    public function cache(): CacheManager
+    {
+        return $this->cache;
+    }
+
     public function on(string $event, callable $listener): self
     {
         $this->events->listen($event, $listener);
@@ -82,5 +87,15 @@ class Client
         $this->dashboardService->boot();
         $this->securityService->boot();
         $this->seoService->boot();
+    }
+
+    /**
+     * Quick-boot helper for Core PHP and custom setups in 1 line of code.
+     */
+    public static function quickBoot(array $config = []): self
+    {
+        $client = new self($config);
+        $client->boot();
+        return $client;
     }
 }

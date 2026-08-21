@@ -69,8 +69,6 @@ require_once __DIR__ . '/vendor/webkernelai/php-sdk/autoload.php';
 ```php
 use WebKernelAI\SDK\Config;
 use WebKernelAI\SDK\Client;
-use WebKernelAI\SDK\Security\Waf;
-use WebKernelAI\SDK\Security\Headers;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -83,26 +81,10 @@ $config = new Config([
     'enable_headers' => true,
 ]);
 
+// 2. Boot WebKernelAI Engine
+// Automatically handles API handshake endpoint (/webkernelai-api), WAF threat filtering, security headers, and dynamic SEO sync
 $client = new Client($config);
-
-// 2. Run Real-Time WAF Threat Filter (SQLi, XSS, RCE, LFI)
-$waf = new Waf();
-$threat = $waf->inspectRequest();
-
-if ($threat['blocked']) {
-    http_response_code(403);
-    header('Content-Type: application/json');
-    echo json_encode([
-        'success' => false,
-        'error'   => 'Blocked by WebKernelAI WAF',
-        'type'    => $threat['type'],
-    ]);
-    exit;
-}
-
-// 3. Inject Production Hardened Security Headers (CSP, HSTS, X-Frame)
-$headers = new Headers();
-$headers->apply();
+$client->boot();
 ```
 
 ---
