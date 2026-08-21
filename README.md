@@ -31,11 +31,16 @@ To securely connect your PHP application to the WebKernelAI Cloud without databa
 ## 🚀 Key Features
 
 - 🛡️ **Embedded WAF (Web Application Firewall)**: Automatically inspects incoming `GET`, `POST`, and `COOKIE` parameters to block SQL injection (UNION / Blind SQLi), Cross-Site Scripting (XSS), Path Traversal (LFI/RFI directory climbing), and Remote Command Injection (RCE).
+- 🔍 **Deep Heuristic File Malware Scanner**: Inspects PHP files line-by-line for `eval(base64_decode())`, `eval(gzinflate())`, direct superglobal command backdoors, and webshell footprints (`c99`, `r57`, `WSO`, `b374k`).
+- 🤖 **Japanese SEO Keyword Spam & Cloaker Defense**: Identifies user-agent bot checks (`googlebot`, `bingbot`) coupled with remote fetching scripts trying to inject hidden spam and rogue `sitemap.xml` files.
+- 🛡️ **Zero-Delete & Multi-Domain Safe**: Operates in non-destructive inspect mode, safeguarding shared hosting environments, subdomains, and addon CMS directories (`wp-config.php`, `artisan`, `composer.json`, `application/`).
+- 🛑 **UploadGuard Engine**: Validates uploaded files, stripping null-bytes, intercepting double extensions (`.php.png`), and inspecting raw file content for embedded `<?php` magic tags.
+- ⏱️ **Rate Limiter & Bot Throttling**: Sliding-window token bucket algorithm that mitigates brute-force attacks and bot scrapers with proxy-aware IP resolution.
 - 🔐 **Cryptographic HMAC-SHA256 Signing**: Protects communication between your application and WebKernelAI Cloud with CSPRNG nonces and strict 300-second replay attack protection.
 - ⚡ **Zero-Latency In-Memory & File Caching**: High-performance local cache manager with automated TTL expiration to keep server memory consumption under 2MB.
 - 🌐 **Automated Security Headers**: Injects production-grade HTTP security headers (`Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`).
-- 📊 **SEO & Telemetry Sync**: Synchronize structured JSON-LD schemas, dynamic robots.txt rules, llms.txt signals, and blocked threat telemetry directly to your WebKernelAI dashboard.
-- 🔌 **Native Framework Adapters**: Drop-in middleware and service providers for Laravel (9, 10, 11+) and CodeIgniter (3 & 4).
+- 📊 **SEO & Live Threat Telemetry**: Synchronize structured JSON-LD schemas, dynamic robots.txt rules, and stream security alerts with line snippets and SHA-256 hashes directly to your WebKernelAI dashboard.
+- 🔌 **Native Framework Adapters**: Drop-in middleware and service providers for Laravel (9, 10, 11+), CodeIgniter (3 & 4), Symfony, and Core PHP.
 
 ---
 
