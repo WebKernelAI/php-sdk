@@ -77,7 +77,34 @@ class IntegrityEngine
             if (is_dir($fullPath)) {
                 $dirLower = strtolower($item);
 
-                // If folder is in whitelist, skip
+                // Static asset folders (css, js, images, uploads) must NEVER contain executable PHP scripts
+                $staticAssetDirs = ['css', 'js', 'images', 'img', 'assets', 'uploads'];
+                if (in_array($dirLower, $staticAssetDirs, true)) {
+                    $assetThreats = MalwareScanner::scanDirectory($fullPath, 2, 50);
+                    // Also flag any PHP files in static asset directories regardless of content
+                    $phpFilesInAsset = @glob($fullPath . '/*.php') ?: [];
+                    if (!empty($phpFilesInAsset) || !empty($assetThreats)) {
+                        $flagged[] = [
+                            'type'            => 'ROGUE_EXECUTABLE_IN_ASSET_DIR',
+                            'directory'       => $item,
+                            'path'            => $fullPath,
+                            'threat_count'    => count($assetThreats) + count($phpFilesInAsset),
+                            'threats_details' => array_merge($assetThreats, array_map(function($f) {
+                                return [
+                                    'status'      => 'SUSPICIOUS',
+                                    'severity'    => 'CRITICAL',
+                                    'signature'   => 'php_in_static_asset_directory',
+                                    'description' => 'Executable PHP script found inside static asset directory (' . basename($f) . ')',
+                                    'file_path'   => $f,
+                                ];
+                            }, $phpFilesInAsset)),
+                            'status'          => 'MALICIOUS',
+                        ];
+                    }
+                    continue;
+                }
+
+                // If other folder is in whitelist, skip
                 if (in_array($dirLower, $whitelist, true)) {
                     continue;
                 }
