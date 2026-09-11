@@ -12,9 +12,11 @@ class WebKernelAISecurityMiddleware
     public function __construct()
     {
         $this->sdk = new Client([
-            'site_id'        => config('services.webkernelai.site_id'),
-            'pairing_secret' => config('services.webkernelai.pairing_secret'),
-            'cache_dir'      => storage_path('framework/cache/webkernelai'),
+            'site_id'         => config('services.webkernelai.site_id') ?: env('WEBKERNELAI_SITE_ID'),
+            'pairing_secret'  => config('services.webkernelai.pairing_secret') ?: env('WEBKERNELAI_PAIRING_SECRET'),
+            'excluded_routes' => config('services.webkernelai.excluded_routes') ?: (env('WEBKERNELAI_EXCLUDED_ROUTES') ? explode(',', env('WEBKERNELAI_EXCLUDED_ROUTES')) : ['/admin', '/backend', '/administrator', '/nova', '/filament', '/dashboard']),
+            'whitelisted_ips' => config('services.webkernelai.whitelisted_ips') ?: (env('WEBKERNELAI_WHITELISTED_IPS') ? explode(',', env('WEBKERNELAI_WHITELISTED_IPS')) : []),
+            'cache_dir'       => storage_path('framework/cache/webkernelai'),
         ]);
     }
 

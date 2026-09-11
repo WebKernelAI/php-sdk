@@ -79,11 +79,13 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // 1. Initialize Configuration (Get keys from https://webkernelai.com/php-sdk)
 $config = new Config([
-    'site_id'        => 'YOUR_SITE_ID',
-    'pairing_secret' => 'YOUR_PAIRING_SECRET_KEY',
-    'api_url'        => 'https://api.webkernelai.com',
-    'enable_waf'     => true,
-    'enable_headers' => true,
+    'site_id'          => 'YOUR_SITE_ID',
+    'pairing_secret'   => 'YOUR_PAIRING_SECRET_KEY',
+    'api_url'          => 'https://api.webkernelai.com',
+    'enable_waf'       => true,
+    'enable_headers'   => true,
+    'excluded_routes'  => ['/admin', '/backend', '/administrator', '/dashboard'], // Bypass WAF on admin panels
+    'whitelisted_ips'  => ['123.456.78.90'], // Optional: whitelist admin/office IPs
 ]);
 
 // 2. Boot WebKernelAI Engine
@@ -106,6 +108,9 @@ WEBKERNELAI_PAIRING_SECRET=your_pairing_secret_key
 WEBKERNELAI_API_URL=https://api.webkernelai.com
 WEBKERNELAI_ENABLE_WAF=true
 WEBKERNELAI_ENABLE_HEADERS=true
+# Optional: Exclude admin routes or whitelist office IPs from WAF inspection:
+WEBKERNELAI_EXCLUDED_ROUTES=/admin,/backend,/nova,/filament,/dashboard
+WEBKERNELAI_WHITELISTED_IPS=123.456.78.90
 ```
 
 2. Register the security middleware in `app/Http/Kernel.php` (or `bootstrap/app.php` for Laravel 11):
@@ -122,7 +127,35 @@ protected $middleware = [
 
 ### 3. CodeIgniter 3 & 4 Integration
 
-For **CodeIgniter 4**, add your credentials in `.env` and register the filter in `app/Config/Filters.php`:
+#### CodeIgniter 3:
+1. In `application/config/config.php`:
+```php
+$config['enable_hooks'] = TRUE;
+$config['webkernelai_site_id'] = 'your_site_id';
+$config['webkernelai_pairing_secret'] = 'your_pairing_secret_key';
+
+// Bypass WAF for your admin panel and whitelist admin IPs:
+$config['webkernelai_excluded_routes'] = ['/admin', '/backend', '/dashboard'];
+$config['webkernelai_whitelisted_ips'] = ['123.456.78.90'];
+```
+
+2. In `application/config/hooks.php`:
+```php
+$hook['pre_system'] = array(
+    'class'    => 'WebKernelAISecurityFilter',
+    'function' => 'hook',
+    'filename' => 'WebKernelAISecurityFilter.php',
+    'filepath' => 'hooks'
+);
+```
+
+#### CodeIgniter 4:
+Add your credentials in `.env`:
+```env
+WEBKERNELAI_SITE_ID = your_site_id
+WEBKERNELAI_PAIRING_SECRET = your_pairing_secret_key
+```
+And register the filter in `app/Config/Filters.php`:
 
 ```php
 // app/Config/Filters.php
