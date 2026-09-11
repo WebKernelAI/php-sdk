@@ -31,9 +31,11 @@ class SecurityService
         $this->telemetry   = new TelemetryQueue($config, $this->cache);
 
         // Load dynamic rules & banned IPs from local cache
-        $dynamicRules = $this->cache->get('dynamic_waf_rules', []);
-        $bannedIps    = $this->cache->get('banned_ips', []);
-        $this->waf    = new Waf($dynamicRules, $bannedIps);
+        $dynamicRules   = $this->cache->get('dynamic_waf_rules', []);
+        $bannedIps      = $this->cache->get('banned_ips', []);
+        $excludedRoutes = $config->getExcludedRoutes();
+        $whitelistedIps = $config->getWhitelistedIps();
+        $this->waf      = new Waf($dynamicRules, $bannedIps, $excludedRoutes, $whitelistedIps);
 
         // Register async shutdown flush for telemetry
         register_shutdown_function([$this->telemetry, 'flushAsync']);

@@ -15,11 +15,15 @@ class Waf
 
     private array $dynamicRules = [];
     private array $bannedIps = [];
+    private array $excludedRoutes = [];
+    private array $whitelistedIps = [];
 
-    public function __construct(array $dynamicRules = [], array $bannedIps = [])
+    public function __construct(array $dynamicRules = [], array $bannedIps = [], array $excludedRoutes = [], array $whitelistedIps = [])
     {
-        $this->dynamicRules = $dynamicRules;
-        $this->bannedIps    = $bannedIps;
+        $this->dynamicRules   = $dynamicRules;
+        $this->bannedIps      = $bannedIps;
+        $this->excludedRoutes = $excludedRoutes;
+        $this->whitelistedIps = $whitelistedIps;
     }
 
     public function setDynamicRules(array $rules): self
@@ -34,13 +38,51 @@ class Waf
         return $this;
     }
 
+    public function setExcludedRoutes(array $routes): self
+    {
+        $this->excludedRoutes = $routes;
+        return $this;
+    }
+
+    public function setWhitelistedIps(array $ips): self
+    {
+        $this->whitelistedIps = $ips;
+        return $this;
+    }
+
     /**
      * Inspect superglobal arrays, request URI, and IP for threats.
      */
     public function inspectRequest(): array
     {
-        // 1. Check IP Blacklist
         $clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
+
+        // 0. Check IP Whitelist (Immediate bypass)
+        if (!empty($clientIp) && in_array($clientIp, $this->whitelistedIps, true)) {
+            return ['blocked' => false, 'bypassed' => true, 'reason' => 'whitelisted_ip'];
+        }
+
+        // 1. Check Excluded Routes (e.g. /admin, /backend, /administrator, /dashboard)
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        $cleanUri = parse_url($requestUri, PHP_URL_PATH) ?: $requestUri;
+        foreach ($this->excludedRoutes as $route) {
+            $trimmedRoute = '/' . trim($route, '/');
+            if (stripos($cleanUri, $trimmedRoute) === 0) {
+                return ['blocked' => false, 'bypassed' => true, 'reason' => 'excluded_route', 'route' => $route];
+            }
+        }
+
+        // 2. Check Active Admin Session (CodeIgniter & standard PHP sessions)
+        if (session_status() === PHP_SESSION_ACTIVE || !empty($_SESSION)) {
+            $adminKeys = ['admin_id', 'is_admin', 'user_id', 'logged_in', 'admin_logged_in', 'admin', 'authenticated'];
+            foreach ($adminKeys as $key) {
+                if (!empty($_SESSION[$key])) {
+                    return ['blocked' => false, 'bypassed' => true, 'reason' => 'authenticated_admin_session'];
+                }
+            }
+        }
+
+        // 3. Check IP Blacklist
         if (!empty($clientIp) && in_array($clientIp, $this->bannedIps, true)) {
             return [
                 'blocked' => true,

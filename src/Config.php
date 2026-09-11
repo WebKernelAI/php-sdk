@@ -22,6 +22,8 @@ class Config
     private string $integrityAction; // 'block', 'quarantine', 'alert_only'
     private string $rootDir;
     private array $allowedDirs;
+    private array $excludedRoutes;
+    private array $whitelistedIps;
     private int $timeout;
     private int $maxRetries;
 
@@ -50,6 +52,8 @@ class Config
         $defaultRoot = $_SERVER['DOCUMENT_ROOT'] ?? (defined('FCPATH') ? FCPATH : getcwd());
         $this->rootDir              = rtrim($config['root_dir'] ?? (getenv('WEBKERNELAI_ROOT_DIR') ?: $defaultRoot), '/\\');
         $this->allowedDirs          = (array) ($config['allowed_dirs'] ?? []);
+        $this->excludedRoutes       = (array) ($config['excluded_routes'] ?? ['/admin', '/backend', '/administrator', '/dashboard']);
+        $this->whitelistedIps       = (array) ($config['whitelisted_ips'] ?? []);
         
         $this->timeout              = (int) ($config['timeout'] ?? 10);
         $this->maxRetries           = (int) ($config['max_retries'] ?? 3);
@@ -74,6 +78,8 @@ class Config
     public function getIntegrityAction(): string { return $this->integrityAction; }
     public function getRootDir(): string { return $this->rootDir; }
     public function getAllowedDirs(): array { return $this->allowedDirs; }
+    public function getExcludedRoutes(): array { return $this->excludedRoutes; }
+    public function getWhitelistedIps(): array { return $this->whitelistedIps; }
     public function getTimeout(): int { return $this->timeout; }
     public function getMaxRetries(): int { return $this->maxRetries; }
 

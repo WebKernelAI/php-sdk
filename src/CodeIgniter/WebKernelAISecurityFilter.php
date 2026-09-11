@@ -12,12 +12,16 @@ class WebKernelAISecurityFilter
     private static function getClient(): Client
     {
         if (self::$client === null) {
-            $siteId        = getenv('WEBKERNELAI_SITE_ID') ?: config_item('webkernelai_site_id');
-            $pairingSecret = getenv('WEBKERNELAI_PAIRING_SECRET') ?: config_item('webkernelai_pairing_secret');
+            $siteId         = getenv('WEBKERNELAI_SITE_ID') ?: config_item('webkernelai_site_id');
+            $pairingSecret  = getenv('WEBKERNELAI_PAIRING_SECRET') ?: config_item('webkernelai_pairing_secret');
+            $excludedRoutes = config_item('webkernelai_excluded_routes') ?: ['/admin', '/backend', '/administrator', '/dashboard'];
+            $whitelistedIps = config_item('webkernelai_whitelisted_ips') ?: [];
 
             $config = ConfigBuilder::make()
                 ->siteId($siteId ?: '')
                 ->pairingSecret($pairingSecret ?: '')
+                ->excludedRoutes(is_array($excludedRoutes) ? $excludedRoutes : explode(',', (string) $excludedRoutes))
+                ->whitelistedIps(is_array($whitelistedIps) ? $whitelistedIps : explode(',', (string) $whitelistedIps))
                 ->cacheDir(defined('WRITEPATH') ? WRITEPATH . 'cache/webkernelai' : sys_get_temp_dir() . '/webkernelai_cache')
                 ->build();
 

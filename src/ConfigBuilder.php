@@ -133,6 +133,21 @@ class ConfigBuilder
         return $this;
     }
 
+    private array $excludedRoutes = ['/admin', '/backend', '/administrator', '/dashboard'];
+    private array $whitelistedIps = [];
+
+    public function excludedRoutes(array $routes): self
+    {
+        $this->excludedRoutes = $routes;
+        return $this;
+    }
+
+    public function whitelistedIps(array $ips): self
+    {
+        $this->whitelistedIps = $ips;
+        return $this;
+    }
+
     public function maxRetries(int $retries): self
     {
         $this->maxRetries = $retries;
@@ -160,6 +175,8 @@ class ConfigBuilder
             'auto_purge'               => $this->autoPurge,
             'root_dir'                 => $this->rootDir,
             'allowed_dirs'             => $this->allowedDirs,
+            'excluded_routes'          => $this->excludedRoutes,
+            'whitelisted_ips'          => $this->whitelistedIps,
             'timeout'                  => $this->timeout,
             'max_retries'              => $this->maxRetries,
         ]);
